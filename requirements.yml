@@ -1,0 +1,25 @@
+name: ml_project_DCCC
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10.17
+  - pandas
+  - matplotlib
+  - seaborn
+  - numpy
+  - scipy
+  - scikit-learn
+  - xgboost
+  - lightgbm
+  - catboost
+  - imbalanced-learn
+  - joblib
+  - pytorch
+  - cudatoolkit
+  - pip
+  - pip:
+      - scikit-optimize
+      - ucimlrepo
+      - pytorch-tabnet
+      - tensorflow
