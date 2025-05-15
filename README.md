@@ -16,9 +16,11 @@ Este proyecto aplica técnicas de machine learning para predecir si un cliente d
 
 ## ⚙️ Requisitos
 
-- Python 3.10
+- Python 3.10.17 (instalado desde archivo requirements.yml, esta version garantiza la compatibilidad de todos los paquetes)
 - Conda (se recomienda usar [Miniconda](https://docs.conda.io/en/latest/miniconda.html) o Anaconda)
+-     Importante al instalar conda marcar en la casilla  Add Miniconda3 to my PATH enviroment variable.
 - Git (opcional, para clonar el repositorio)
+- Instalar en Visual Code la extension Jupyter Notebook
 
 ---
 
@@ -43,6 +45,9 @@ conda env create -f requirements.yml
 
 > Este comando instalará todas las dependencias necesarias, incluyendo `pandas`, `scikit-learn`, `lightgbm`, `catboost`, `pytorch`, entre otros.
 
+
+
+
 ---
 
 ### 3. Activar el entorno
@@ -65,13 +70,9 @@ data/default_of_credit_card_clients.xls
 
 ### 5. Ejecutar el análisis
 
-Abre JupyterLab o Jupyter Notebook y navega hasta la carpeta `notebooks/`:
+Abrir Visual Code y navega hasta la carpeta `notebooks/`:
 
-```bash
-jupyter lab
-```
-
-Abre `ml_project_DCCC.ipynb` y ejecuta todas las celdas. Alternativamente, puedes usar VSCode con Jupyter integrado.
+Abre `ml_project_DCCC.ipynb` y ejecuta todas las celdas usando VSCode con Jupyter integrado.
 
 ---
 
@@ -98,11 +99,6 @@ Abre `ml_project_DCCC.ipynb` y ejecuta todas las celdas. Alternativamente, puede
 
 ---
 
-## 🤝 Contribuciones
-
-Sugerencias son bienvenidas. Siéntete libre de abrir issues o contribuir con mejoras.
-
----
 
 ## 📝 Licencia
 
@@ -111,5 +107,10 @@ Este proyecto se entrega bajo la Licencia MIT.
 ---
 
 ## 💡 Autor
+---
+Ing. Salvador Gurdian
+Ing. Omar Zuniga
+
+---
 
 
