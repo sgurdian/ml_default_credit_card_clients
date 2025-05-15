@@ -1,0 +1,253 @@
+% main.tex
+\documentclass[journal]{apa7}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{csquotes}
+\usepackage[skip=12pt, indent=0pt]{parskip}
+\pagestyle{plain}
+\usepackage{placeins} 
+\usepackage{float}
+\usepackage{enumitem}
+
+
+% Metadatos del documento
+\shorttitle{Default of Credit Card Clients}
+\title{Proyecto Final \\ Default of Credit Card Clients}
+\author{%
+  Ing.\ Omar Manuel Zúniga Ortega\thanks{Universidad Americana (UAM)} \\
+  Ing.\ Salvador Ignacio Gurdián Jarquín\thanks{Universidad Americana (UAM)}%
+}
+\affiliation{Universidad Americana (UAM), Managua, Nicaragua}
+
+\begin{document}
+\maketitle
+
+
+\section{Introducción}
+
+La gestión eficaz del riesgo crediticio es un factor crítico para la estabilidad financiera de las instituciones bancarias y emisoras de tarjetas de crédito. En un contexto de creciente morosidad y presiones regulatorias, la capacidad de anticipar posibles incumplimientos de pago resulta fundamental para minimizar pérdidas y optimizar las estrategias de cobranza y otorgamiento de crédito.
+
+El dataset \enquote{Default of Credit Card Clients} (ID: 350) del UCI Machine Learning Repository reúne datos reales de 30\,000 clientes de tarjetas de crédito en Taiwán, incluyendo variables demográficas, límites de crédito, historial de pagos y montos facturados y pagados durante seis meses consecutivos. Este conjunto de datos constituye un referente académico ampliamente utilizado para la investigación en predicción de riesgo crediticio (Yeh \& Lien, 2009).
+
+El presente trabajo se enmarca como proyecto final de la asignatura \textit{Machine Learning para la Analítica de Negocios} del programa de Maestría en Inteligencia de Negocios y Análisis de Datos de la Universidad Americana. El objetivo principal ha sido desarrollar un modelo predictivo supervisado capaz de anticipar el incumplimiento de pago en la próxima facturación, utilizando técnicas de machine learning y aplicando rigurosamente los procesos de exploración, selección de variables, ingeniería de características, ajuste de hiperparámetros y evaluación de modelos.
+
+No obstante, a pesar del exhaustivo pipeline de experimentación, los resultados obtenidos en este estudio no lograron un nivel de recall o sensibilidad plenamente satisfactoria para un entorno real de producción bancaria. Esta limitación, lejos de invalidar el trabajo, aporta un análisis crítico sobre las dificultades prácticas que enfrentan los modelos de machine learning al lidiar con datasets inherentemente desbalanceados, complejidad multivariada y limitaciones en la calidad de los datos históricos. Como contribución académica, se documentan tanto los avances como las oportunidades de mejora, sentando una base sólida para futuras investigaciones que permitan superar las barreras encontradas y evolucionar hacia modelos más robustos y confiables para la predicción temprana de incumplimientos crediticios.
+
+\section{Datos}
+
+Para la ejecución del presente proyecto se utilizó el dataset \enquote{Default of Credit Card Clients} (ID: 350), disponible públicamente en el UCI Machine Learning Repository. La fuente original corresponde a registros reales anonimizados de clientes de tarjetas de crédito de una institución financiera en Taiwán, recolectados a partir de sistemas OLTP (Online Transaction Processing) y posteriormente preparados como dataset académico (Yeh \& Lien, 2009).
+
+La base de datos consta de 30\,000 registros y 25 variables, incluyendo características demográficas, historial de pagos mensuales, montos facturados, montos pagados y la variable objetivo correspondiente al incumplimiento de pago al mes siguiente.
+
+La estructura de los datos incluye variables numéricas y categóricas. Entre las primeras se encuentran el límite de crédito otorgado, la edad y los montos facturados/pagados en cada mes (abril a septiembre de 2005). Las variables categóricas incluyen el género (hombre/mujer), nivel educativo (posgrado, universidad, secundaria, otros) y estado civil (casado, soltero, otros). Asimismo, se incluyen seis variables ordinales que representan el estado del historial de pago de los últimos seis meses, codificadas de \(-2\) (pago adelantado) a \(8\) (retraso de ocho meses). 
+
+La variable objetivo \(Y\) indica incumplimiento de pago: \(1\) para clientes que no cumplieron sus obligaciones y \(0\) para aquellos que sí lo hicieron. La distribución de clases presenta un claro desbalance: aproximadamente 22\,\% de incumplimientos frente a 78\,\% de pagos regulares.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.75\linewidth]{Imagen1.png}
+ \caption{Distribución de incumplimiento. \\ \textbf{Fuente:} Elaboración propia.}
+  \label{fig:distribucion-incumplimiento}
+\end{figure}
+
+Durante la etapa de preprocesamiento, se realizó una limpieza exhaustiva de los datos. Se verificaron y gestionaron valores nulos (inexistentes en este caso), se eliminaron registros duplicados y se redefinieron las etiquetas de las variables para facilitar su interpretación. Se aplicó codificación categórica (\emph{label mapping}) y estandarización de variables numéricas, así como la creación de nuevas variables mediante \emph{feature engineering}, incorporando indicadores como promedio de retraso, tendencia de morosidad, uso relativo del crédito, ratio de pago sobre facturación, escalamiento de mora y disciplina de pago en los meses previos.
+
+Las variables con alta correlación ($\rho \geq 0.8$) fueron eliminadas para reducir la multicolinealidad y mejorar la estabilidad del modelo.
+
+El conjunto de datos final, luego de la depuración y creación de variables, consta de 19 variables predictoras más la variable objetivo. Para la construcción de los modelos, el dataset se particionó mediante \emph{hold-out}, asignando el 70\,\% a entrenamiento (\emph{train set}) y el 30\,\% a validación (\emph{test set}), garantizando el equilibrio de clases mediante \emph{stratification} en la división. Esta partición permitió contar con muestras independientes para ajustar los modelos y evaluar su capacidad predictiva sin sesgos.
+
+\section{Metodología}
+
+El proceso metodológico seguido en este estudio respondió a un enfoque sistemático orientado a maximizar la capacidad predictiva del modelo para detectar clientes en riesgo de incumplimiento de pago.
+
+\subsection{Selección de algoritmos}
+
+Se exploraron múltiples algoritmos de clasificación supervisada ampliamente reconocidos en la literatura de machine learning y en aplicaciones financieras. Los modelos evaluados fueron:
+
+\begin{itemize}
+  \item \textbf{CatBoost Classifier}: un algoritmo de boosting que maneja eficientemente variables categóricas y reduce el sesgo de predicción (Prokhorenkova et al., 2018).
+  \item \textbf{LightGBM Classifier}: un algoritmo de boosting que utiliza técnicas como GOSS y EFB para mejorar la eficiencia y precisión en grandes volúmenes de datos (Ke et al., 2017).
+  \item \textbf{Balanced Random Forest Classifier}: una variante del Random Forest que equilibra las clases mediante submuestreo de la clase mayoritaria en cada árbol (Lemaitre et al., 2017).
+  \item \textbf{Multi-Layer Perceptron (MLP)}: una red neuronal feedforward que aprende funciones no lineales para tareas de clasificación (Pedregosa et al., 2011).
+\end{itemize}
+
+Estos modelos fueron seleccionados por su capacidad para manejar datos estructurados, su robustez frente a \emph{outliers} y su versatilidad para trabajar con datasets desbalanceados. Se emplearon tres enfoques de ajuste de hiperparámetros:
+
+\begin{itemize}
+  \item \emph{RandomizedSearchCV}: búsqueda aleatoria de combinaciones de hiperparámetros.
+  \item \emph{BayesSearchCV}: optimización bayesiana para encontrar combinaciones óptimas.
+  \item \emph{GridSearchCV}: búsqueda exhaustiva en una cuadrícula de hiperparámetros.
+\end{itemize}
+
+La métrica de selección utilizada para optimizar cada modelo fue el \emph{recall} sobre la clase positiva (incumplimiento), por ser la métrica crítica en gestión de riesgo crediticio.
+
+\subsection{Feature Engineering}
+
+Se llevó a cabo una profunda fase de ingeniería de características con el fin de enriquecer la señal predictiva del dataset original. Se desarrollaron variables derivadas agrupadas en cuatro bloques:
+
+\begin{itemize}
+  \item \textbf{Señales de mora}: promedio de retraso mensual, número de meses en mora, banderas de escalamiento de morosidad y severidad.
+  \item \textbf{Capacidad de crédito}: indicadores como uso promedio y máximo del límite de crédito y su tendencia temporal.
+  \item \textbf{Disciplina de pago}: relaciones entre montos pagados y montos facturados, coeficiente de variación y tendencia de ratios de pago.
+  \item \textbf{Demografía}: variables dummificadas correspondientes a nivel educativo, género y estado civil.
+\end{itemize}
+
+Se aplicaron técnicas de reducción de multicolinealidad (Spearman $\rho \geq 0.8$) eliminando variables redundantes, priorizando aquellas con mayor capacidad discriminativa (AUC univariante superior).
+
+\subsection{Arquitectura del modelo}
+
+Se diseñó un pipeline estandarizado bajo la librería \texttt{scikit-learn}, incorporando las siguientes etapas:
+
+\begin{itemize}
+  \item \textbf{Preprocesamiento}: imputación de valores faltantes, estandarización de variables numéricas y codificación \emph{one-hot} para variables categóricas.
+  \item \textbf{Balanceo de clases}: aplicación de SMOTE (\emph{Synthetic Minority Over-sampling Technique}) para mitigar el fuerte desbalance de clases, excepto para Balanced Random Forest que lo gestiona internamente (Chawla et al., 2002).
+  \item \textbf{Modelo base}: inclusión del clasificador correspondiente con hiperparámetros definidos a través de las técnicas de búsqueda mencionadas.
+  \item \textbf{Calibración de probabilidad}: ajuste final mediante \texttt{CalibratedClassifierCV} para obtener probabilidades de salida más fiables (Niculescu-Mizil \& Caruana, 2005).
+  \item \textbf{Optimización de umbral}: proceso de optimización de umbral sobre la curva Precision–Recall, maximizando el \emph{recall} sujeto a una restricción mínima de \emph{precision} $\geq 0.50$.
+\end{itemize}
+
+La métrica de selección utilizada para optimizar cada modelo fue el \emph{recall} sobre la clase positiva (incumplimiento), por ser la métrica crítica en gestión de riesgo crediticio.
+
+\section{Resultados}
+
+\subsection{Métricas cuantitativas}
+
+Los modelos entrenados para predecir el incumplimiento crediticio fueron evaluados mediante métricas estándar: precisión, \emph{accuracy}, \emph{recall}, F1‐score y AUC–ROC, así como mediante matrices de confusión.
+
+\begin{table}[!htb]
+  \centering
+  \caption{Resumen de métricas cuantitativas por modelo y método}
+  \label{tab:metricas-modelos}
+  \resizebox{\linewidth}{!}{%
+    \begin{tabular}{@{}lccccc@{}}
+      \toprule
+      \textbf{Modelo y Método}       & \textbf{Accuracy} & \textbf{Precisión} & \textbf{Recall} & \textbf{F1‐Score} & \textbf{ROC AUC} \\
+      \midrule
+      BalRF (Randomized)             & 0.779             & 0.5                & 0.561           & 0.529             & 0.771           \\
+      LightGBM (Randomized)          & 0.779             & 0.5                & 0.556           & 0.527             & 0.765           \\
+      LightGBM (Grid)                & 0.779             & 0.5                & 0.553           & 0.525             & 0.762           \\
+      LightGBM (Bayes)               & 0.780             & 0.503              & 0.551           & 0.526             & 0.763           \\
+      CatBoost (Bayes)               & 0.779             & 0.5                & 0.550           & 0.524             & 0.752           \\
+      MLP (Bayes)                    & 0.779             & 0.5                & 0.547           & 0.522             & 0.764           \\
+      MLP (Grid)                     & 0.779             & 0.5                & 0.546           & 0.522             & 0.766           \\
+      CatBoost (Grid)                & 0.779             & 0.5                & 0.541           & 0.520             & 0.755           \\
+      BalRF (Bayes)                  & 0.779             & 0.5                & 0.540           & 0.519             & 0.760           \\
+      BalRF (Grid)                   & 0.779             & 0.5                & 0.535           & 0.517             & 0.760           \\
+      MLP (Randomized)               & 0.779             & 0.5                & 0.518           & 0.509             & 0.756           \\
+      CatBoost (Randomized)          & 0.779             & 0.5                & 0.142           & 0.221             & 0.671           \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+\FloatBarrier  % evita que la figura flote por encima de la tabla
+
+Se evidencia que el modelo \textbf{Balanced Random Forest (BalRF)} ajustado mediante \emph{RandomizedSearchCV} logró el mayor \emph{recall} (0.561), sugiriendo un mejor desempeño para identificar correctamente a los clientes en riesgo, criterio prioritario en contextos financieros.
+
+\begin{figure}[H]       % H = “Here, absolutely here”
+  \centering
+  \includegraphics[width=0.75\linewidth]{Imagen2.png}
+  \caption{Comparación de Modelos y Búsquedas según Recall.\\\textbf{Fuente:} Elaboración propia.}
+  \label{fig:comparacion-recall}
+\end{figure}
+\section{Análisis Cualitativo}
+
+La evaluación cualitativa mostró que:
+
+\begin{itemize}
+  \item \textbf{Balanced Random Forest (BalRF)} presentó la mejor capacidad para captar verdaderos positivos, siendo especialmente eficiente para gestionar clases desbalanceadas.
+  \item \textbf{LightGBM} y \textbf{CatBoost} exhibieron buena precisión pero baja sensibilidad al emplear umbrales predeterminados (0.5). El ajuste fino del umbral mostró una mejora notable en \emph{recall}, manteniendo una precisión aceptable (~0.50).
+  \item El modelo \textbf{MLP} mostró dificultades de convergencia, limitando su potencial para una precisión elevada.
+\end{itemize}
+\subsection{Ejemplos de Clasificación y Análisis de Errores}
+
+Mediante la matriz de confusión, el modelo BalRF (Randomized) identificó correctamente 1\,117 de 1\,991 casos positivos. Sin embargo, mostró una tasa considerable de falsos positivos (1\,117 casos). Esto implica que aunque el modelo es capaz de detectar correctamente muchos casos de incumplimiento, también genera un número importante de falsas alarmas, lo que podría resultar en costos operativos adicionales para las entidades financieras.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\linewidth]{Imagen3.png}
+  \caption[Matriz de Confusión de BalRF]{Matriz de confusión del modelo \textbf{Balanced Random Forest (BalRF)} ajustado mediante RandomizedSearchCV.\\\textbf{Fuente:} Elaboración propia.}
+  \label{fig:matriz-confusion-balrf}
+\end{figure}
+
+\section{Interpretación}
+
+Los resultados revelan la complejidad inherente a la predicción del incumplimiento crediticio. Aunque ninguno de los modelos alcanza un desempeño perfecto, el \textbf{Balanced Random Forest} demostró ser el más apto para un escenario bancario donde minimizar falsos negativos (clientes que incumplen y no son detectados) es crítico. El ajuste del umbral de decisión según la curva Precision–Recall fue clave para optimizar los resultados.
+
+\section{Limitaciones}
+
+\begin{itemize}
+  \item El desbalance significativo en el conjunto de datos afectó negativamente la capacidad predictiva de algunos modelos.
+  \item Calidad y cantidad limitadas de características disponibles restringieron la potencialidad de capturar patrones predictivos más robustos.
+  \item La calibración de probabilidades, aunque mejoró los resultados, introdujo complejidad adicional en el pipeline de evaluación.
+\end{itemize}
+
+\section{Comparaciones entre modelos generados}
+
+Al comparar los modelos mediante diferentes estrategias de optimización hiperparamétrica, se observó que:
+
+\begin{itemize}
+  \item \textbf{RandomizedSearchCV} proporcionó los mejores resultados globales, especialmente en términos de recall.
+  \item \textbf{BayesSearchCV} ofreció una búsqueda eficiente, pero resultados ligeramente inferiores en recall respecto a RandomizedSearchCV.
+  \item \textbf{GridSearchCV} mostró desempeño competitivo, pero con recall ligeramente inferior, sugiriendo una menor capacidad para explorar eficientemente el espacio de parámetros en comparación con los otros métodos.
+\end{itemize}
+
+En definitiva, el \textbf{Balanced Random Forest} optimizado mediante \textbf{RandomizedSearchCV} demostró ser la mejor combinación, alcanzando un recall máximo de 0.561, constituyendo un resultado óptimo en términos de gestión de riesgo crediticio.
+
+\section{Conclusiones}
+
+\subsection{Evaluación crítica de los resultados}
+
+A pesar de implementar un pipeline exhaustivo que incluyó preprocesamiento, ingeniería de características, balanceo de clases, calibración de probabilidades y optimización de hiperparámetros, los modelos desarrollados no alcanzaron un nivel de \emph{recall} o sensibilidad plenamente satisfactoria para su aplicación en un entorno real de producción bancaria. El modelo que mejor desempeño mostró, el \textbf{Balanced Random Forest} optimizado mediante \emph{RandomizedSearchCV}, logró un \emph{recall} del 56.1\,\%, lo que indica que aún se presentan desafíos significativos en la detección precisa de clientes en riesgo de incumplimiento.
+
+Esta limitación pone de manifiesto las dificultades inherentes al uso de modelos de machine learning en contextos con datasets desbalanceados, complejidad multivariada y restricciones en la calidad y cantidad de los datos históricos disponibles. Además, se observó que técnicas como SMOTE, aunque útiles, pueden introducir problemas de calibración en los modelos, afectando la confiabilidad de las probabilidades predichas.
+
+\subsection{Contribución académica}
+
+A pesar de los resultados subóptimos, este estudio aporta una documentación detallada del proceso de modelado y de las dificultades encontradas, ofreciendo una base sólida para futuras investigaciones. Se destacan las siguientes contribuciones:
+\begin{itemize}
+  \item Identificación de las limitaciones de los modelos tradicionales de machine learning en la predicción de incumplimiento crediticio con datos desbalanceados.
+  \item Evaluación de diversas técnicas de balanceo de clases y su impacto en la calibración y desempeño de los modelos.
+  \item Análisis de la necesidad de incorporar fuentes de datos adicionales y técnicas avanzadas para mejorar la capacidad predictiva.
+\end{itemize}
+
+\subsection{Recomendaciones para futuros trabajos}
+
+Para superar las limitaciones identificadas y avanzar hacia modelos más robustos y confiables, se proponen las siguientes líneas de acción:
+\begin{itemize}
+  \item \textbf{Enriquecimiento de datos:} Incorporar fuentes de datos adicionales (transaccionales en tiempo real, macroeconómicos, redes sociales) que aporten variables predictivas no presentes en el dataset original.
+  \item \textbf{Técnicas avanzadas de balanceo:} Explorar métodos como ADASYN o submuestreo informados para mejorar la representación de la clase minoritaria sin comprometer la calibración.
+  \item \textbf{Modelos de ensamble y deep learning:} Investigar enfoques de stacking, blending y arquitecturas de deep learning que puedan capturar relaciones no lineales y patrones complejos.
+  \item \textbf{Optimización de umbrales y costos:} Implementar aprendizaje sensible al costo y ajuste dinámico de umbrales para minimizar falsos negativos en la gestión del riesgo crediticio.
+  \item \textbf{Evaluación continua y validación cruzada:} Adoptar validaciones cruzadas más robustas y evaluaciones continuas para adaptar los modelos a cambios en los patrones de los datos.
+\end{itemize}
+
+En resumen, aunque los resultados obtenidos en este estudio no alcanzaron los niveles deseados de sensibilidad, proporcionan una comprensión valiosa de los desafíos actuales y delinean un camino claro para futuras investigaciones que busquen mejorar la predicción de incumplimiento crediticio mediante técnicas de machine learning.
+
+
+\begin{thebibliography}{}
+
+\bibitem{Chawla2002}
+Chawla, N. V., Bowyer, K. W., Hall, L. O., \& Kegelmeyer, W. P. (2002). SMOTE: Synthetic Minority Over-sampling Technique. \emph{Journal of Artificial Intelligence Research}, 16, 321–357. https://doi.org/10.1613/jair.953
+
+\bibitem{Ke2017}
+Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., \ldots{} \& Liu, T. Y. (2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. \emph{Advances in Neural Information Processing Systems}, 30, 3146–3154.
+
+\bibitem{Lemaitre2017}
+Lemaitre, G., Nogueira, F., \& Aridas, C. K. (2017). Imbalanced-learn: A Python Toolbox to Tackle the Curse of Imbalanced Datasets in Machine Learning. \emph{Journal of Machine Learning Research}, 18(17), 1–5. https://jmlr.org/papers/volume18/16-365/16-365.pdf
+
+\bibitem{NiculescuMizil2005}
+Niculescu-Mizil, A., \& Caruana, R. (2005). Predicting Good Probabilities with Supervised Learning. \emph{Proceedings of the 22nd International Conference on Machine Learning}, 625–632. https://doi.org/10.1145/1102351.1102430
+
+\bibitem{Pedregosa2011}
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., \ldots{} \& Duchesnay, E. (2011). Scikit-learn: Machine Learning in Python. \emph{Journal of Machine Learning Research}, 12, 2825–2830.
+
+\bibitem{YehLien2009}
+Yeh, I. C., \& Lien, C. H. (2009). The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients. \emph{Expert Systems with Applications}, 36(2), 2473–2480. https://doi.org/10.1016/j.eswa.2007.12.020
+
+\end{thebibliography}
+
+
+\end{document}
+
