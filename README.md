@@ -27,8 +27,8 @@ Este proyecto aplica técnicas de machine learning para predecir si un cliente d
 ### 1. Clonar el repositorio (opcional)
 
 ```bash
-git clone https://github.com/tu_usuario/nombre_proyecto.git
-cd nombre_proyecto
+git clone https://github.com/sgurdian/ml_default_credit_card_clients/tree/development
+cd nombre_proyectoml_default_credit_card_clients
 ```
 
 > O descarga el `.zip` desde GitHub y descomprímelo.
@@ -38,7 +38,7 @@ cd nombre_proyecto
 ### 2. Crear el entorno Conda
 
 ```bash
-conda env create -f environment.yml
+conda env create -f requirements.yml
 ```
 
 > Este comando instalará todas las dependencias necesarias, incluyendo `pandas`, `scikit-learn`, `lightgbm`, `catboost`, `pytorch`, entre otros.
@@ -71,7 +71,7 @@ Abre JupyterLab o Jupyter Notebook y navega hasta la carpeta `notebooks/`:
 jupyter lab
 ```
 
-Abre `main_analysis.ipynb` y ejecuta todas las celdas. Alternativamente, puedes usar VSCode con Jupyter integrado.
+Abre `ml_project_DCCC.ipynb` y ejecuta todas las celdas. Alternativamente, puedes usar VSCode con Jupyter integrado.
 
 ---
 
@@ -100,7 +100,7 @@ Abre `main_analysis.ipynb` y ejecuta todas las celdas. Alternativamente, puedes 
 
 ## 🤝 Contribuciones
 
-Pull requests y sugerencias son bienvenidas. Siéntete libre de abrir issues o contribuir con mejoras.
+Sugerencias son bienvenidas. Siéntete libre de abrir issues o contribuir con mejoras.
 
 ---
 
