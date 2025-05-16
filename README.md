@@ -29,8 +29,8 @@ Este proyecto aplica técnicas de machine learning para predecir si un cliente d
 ### 1. Clonar el repositorio (opcional)
 
 ```bash
-git clone https://github.com/sgurdian/ml_default_credit_card_clients/tree/development
-cd nombre_proyectoml_default_credit_card_clients
+git clone https://github.com/sgurdian/ml_default_credit_card_clients
+cd ml_default_credit_card_clients
 ```
 
 > O descarga el `.zip` desde GitHub y descomprímelo.
