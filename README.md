@@ -18,7 +18,7 @@ Este proyecto aplica técnicas de machine learning para predecir si un cliente d
 
 - Python 3.10.17 (instalado desde archivo requirements.yml, esta version garantiza la compatibilidad de todos los paquetes)
 - Conda (se recomienda usar [Miniconda](https://docs.conda.io/en/latest/miniconda.html) o Anaconda)
--     Importante al instalar conda marcar en la casilla  Add Miniconda3 to my PATH enviroment variable.
+- Importante al instalar conda marcar en la casilla  Add Miniconda3 to my PATH enviroment variable.
 - Git (opcional, para clonar el repositorio)
 - Instalar en Visual Code la extension Jupyter Notebook
 
@@ -107,10 +107,10 @@ Este proyecto se entrega bajo la Licencia MIT.
 ---
 
 ## 💡 Autor
----
-Ing. Salvador Gurdian
-Ing. Omar Zuniga
 
----
+- Ing. Salvador Gurdian
+- Ing. Omar Zuniga
+
+
 
 
